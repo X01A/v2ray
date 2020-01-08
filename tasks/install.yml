@@ -1,0 +1,19 @@
+---
+- name: Unarchive v2ray tarbar
+  unarchive:
+    remote_src: yes
+    src: "{{install_location}}/v2ray.zip"
+    dest: "{{install_location}}/app"
+
+- name: Render service
+  template:
+    src: "../templates/v2ray.service"
+    dest: /etc/systemd/system/v2ray.service
+    mode: 0755
+  notify: start v2ray
+
+- name: Cleanup tarbar
+  file:
+    state: absent
+    path: "{{install_location}}/v2ray.zip"
+

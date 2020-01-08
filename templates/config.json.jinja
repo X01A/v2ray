@@ -1,0 +1,23 @@
+{
+    "inbounds": [{
+        "port": {{port}},
+        "protocol": "vmess",
+        "settings": {
+            "clients": {{ users | to_json }}
+        },
+        "streamSettings": {
+            "network": "tcp"
+        },
+        "tag": "proxy"
+    }],
+    "log": {
+        "loglevel": "debug",
+        "access": "access.log",
+        "error": "error.log"
+    },
+    "outbounds": [{
+        "protocol": "freedom",
+        "tag": "direct",
+        "settings": {}
+    }]
+}

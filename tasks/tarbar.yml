@@ -1,0 +1,29 @@
+---
+- name: Get latest v2ray version
+  when: version == "latest"
+  uri:
+    url: https://api.github.com/repos/v2ray/v2ray-core/releases
+    return_content: yes
+    body_format: json
+  register: v2ray_version
+
+- name: Set version from github
+  when: version == "latest"
+  set_fact:
+    version: "{{v2ray_version.json[0].name}}"
+
+- name: Get tarbar checksum
+  uri:
+    url: https://github.com/v2ray/v2ray-core/releases/download/{{version}}/v2ray-linux-64.zip.dgst
+    return_content: yes
+  register: v2ray_checksum
+
+- name: Set checksum
+  set_fact:
+    checksum: "{{v2ray_checksum.content | regex_search('SHA256= ([0-9a-z]{64})') | regex_replace('SHA256= ', '')}}"
+
+- name: Get latest install tarbar
+  get_url:
+    url: https://github.com/v2ray/v2ray-core/releases/download/{{version}}/v2ray-linux-64.zip
+    dest: "{{install_location}}/v2ray.zip"
+    checksum: "sha256:{{checksum}}"

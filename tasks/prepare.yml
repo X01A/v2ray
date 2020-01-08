@@ -1,0 +1,10 @@
+---
+- name: Create v2ray dir
+  file:
+    path: "{{install_location}}"
+    state: directory
+
+- name: Create v2ray app dir
+  file:
+    path: "{{install_location}}/app"
+    state: directory

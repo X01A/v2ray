@@ -1,0 +1,7 @@
+---
+- name: Render config
+  template:
+    src: "../templates/config.json.jinja"
+    dest: "{{install_location}}/config.json"
+    mode: 0755
+  notify: start v2ray

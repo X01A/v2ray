@@ -1,0 +1,13 @@
+[Unit]
+Description=Project V Server
+After=network.target
+
+[Service]
+ExecStart={{install_location}}/app/v2ray -config {{install_location}}/config.json
+WorkingDirectory={{install_location}}
+Restart=always
+LimitNOFILE=512000
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+
+[Install]
+WantedBy=multi-user.target
