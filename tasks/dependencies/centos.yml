@@ -3,5 +3,5 @@
   yum:
     name:
       - unzip
-      - nohup
+      - coreutils
     state: present

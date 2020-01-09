@@ -2,6 +2,6 @@
   apt:
     pkg:
       - unzip
-      - nohup
+      - coreutils
     state: present
     update_cache: yes
