@@ -1,0 +1,7 @@
+---
+- name: Install centos deps
+  yum:
+    name:
+      - unzip
+      - nohup
+    state: present

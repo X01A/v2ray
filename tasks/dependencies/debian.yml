@@ -1,0 +1,7 @@
+- name: Install debian deps
+  apt:
+    pkg:
+      - unzip
+      - nohup
+    state: present
+    update_cache: yes
