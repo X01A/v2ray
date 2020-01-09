@@ -21,7 +21,7 @@
     state: present
     terms_agreed: yes
     acme_version: 2
-    acme_directory: hhttps://acme-v02.api.letsencrypt.org/directory
+    acme_directory: "{{ tls.directory }}"
     contact: []
 
 - name: Create acme cert with http challenge
@@ -32,7 +32,7 @@
     dest: "{{install_location}}/cert/sign.pem"
     fullchain_dest: "{{install_location}}/cert/fullchain.pem"
     acme_version: 2
-    acme_directory: https://acme-v02.api.letsencrypt.org/directory
+    acme_directory: "{{ tls.directory }}"
 
   register: acme_data
 

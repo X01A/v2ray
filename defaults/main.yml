@@ -6,11 +6,7 @@ install_location: /usr/local/v2ray
 version: latest
 
 # v2ray inbound users
-users:
-  - email: indexyz@protonmail.com
-    alterId: 2
-    id: fb9afa10-5818-4903-bd15-e819197db2ef
-    level: 0
+users: []
 
 # Inbound port
 port: 32567
@@ -20,6 +16,8 @@ network: tcp
 
 # Enable tls transproto
 tls:
-  enable: true
+  enable: false
   # playbook will auto sign cert for hostname
   hostname: example.com
+
+  directory: https://acme-v02.api.letsencrypt.org/directory
