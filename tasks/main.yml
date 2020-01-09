@@ -21,3 +21,8 @@
   tags:
     - config
   when: tls.enable
+
+- import_tasks: test.yml
+  tags:
+    - test
+  when: test_mode is defined

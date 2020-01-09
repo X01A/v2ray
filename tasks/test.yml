@@ -1,0 +1,3 @@
+---
+- name: Test config vaild
+  shell: cat {{ install_location }}/config.json | python -m json.tool
