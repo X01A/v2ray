@@ -15,11 +15,11 @@ users:
 # Inbound port
 port: 32567
 
-# Networking protocol (tcp / kcp / ws / h2 / quic)
+# Networking protocol (tcp / kcp / ws)
 network: tcp
 
 # Enable tls transproto
 tls:
-  enable: false
+  enable: true
   # playbook will auto sign cert for hostname
-  hostname: v2ray.develop.indexyz.network
+  hostname: example.com

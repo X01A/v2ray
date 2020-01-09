@@ -6,7 +6,46 @@
             "clients": {{ users | to_json }}
         },
         "streamSettings": {
-            "network": "tcp"
+            {% if tls.enable %}
+                "security": "tls",
+                "tlsSettings": {
+                    "serverName": "{{ tls.hostname }}",
+                    "certificates": [{
+                        "certificateFile": "{{ install_location }}/cert/fullchain.pem",
+                        "keyFile": "{{ install_location }}/cert/private.pem"
+                    }]
+                },
+            {% endif %}
+            {% if network == "tcp" %}
+                "network": "tcp"
+            {% elif network == "kcp" %}
+                "network": "kcp",
+                {% if kcpSettings is defined %}
+                    "kcpSettings": {{ kcpSettings | to_json }}
+                {% else %}
+                    "kcpSettings": {
+                        "mtu": 1350,
+                        "tti": 20,
+                        "uplinkCapacity": 5,
+                        "downlinkCapacity": 20,
+                        "congestion": false,
+                        "readBufferSize": 1,
+                        "writeBufferSize": 1,
+                        "header": {
+                            "type": "none"
+                        }
+                    }
+                {% endif %}
+            {% else %}
+                "network": "websocket"
+                {% if wsSettings is defined %}
+                    "wsSettings": {{ wsSettings | to_json }}
+                {% else %}
+                    "wsSettings": {
+                        "path": "/",
+                    }
+                {% endif %}
+            {% endif %}
         },
         "tag": "proxy"
     }],

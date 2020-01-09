@@ -1,0 +1,88 @@
+---
+- name: Create tls private key
+  openssl_privatekey:
+    path: "{{install_location}}/cert/private.pem"
+    curve: secp256k1
+
+- name: Create tls cert csr
+  openssl_csr:
+    path: "{{install_location}}/cert/cert.csr"
+    privatekey_path: "{{install_location}}/cert/private.pem"
+    common_name: "{{ tls.hostname }}"
+
+- name: Create amce account private key
+  openssl_privatekey:
+    path: "{{install_location}}/cert/account.pem"
+    curve: secp256k1
+
+- name: Create acme account
+  acme_account:
+    account_key_src: "{{install_location}}/cert/account.pem"
+    state: present
+    terms_agreed: yes
+    acme_version: 2
+    acme_directory: hhttps://acme-v02.api.letsencrypt.org/directory
+    contact: []
+
+- name: Create acme cert with http challenge
+  acme_certificate:
+    account_key_src: "{{install_location}}/cert/account.pem"
+    challenge: http-01
+    csr: "{{install_location}}/cert/cert.csr"
+    dest: "{{install_location}}/cert/sign.pem"
+    fullchain_dest: "{{install_location}}/cert/fullchain.pem"
+    acme_version: 2
+    acme_directory: https://acme-v02.api.letsencrypt.org/directory
+
+  register: acme_data
+
+- name: Create tmp tls dir
+  file:
+    path: /tmp/acme/.well-known/acme-challenge
+    state: directory
+
+- name: Copy challenge file
+  copy:
+    dest: /tmp/acme/{{ acme_data['challenge_data'][tls.hostname]['http-01']['resource'] }}
+    content: "{{ acme_data['challenge_data'][tls.hostname]['http-01']['resource_value'] }}"
+  when: acme_data is changed
+
+- name: Run python simple server
+  shell:
+    cmd: |
+      /bin/sh -c 'nohup python2 -m SimpleHTTPServer 80 >/dev/null 2>&1 & echo $! > /tmp/acme/pid'
+    chdir: /tmp/acme
+  when: acme_data is changed
+
+- name: Self test server
+  uri:
+    method: GET
+    url: "http://{{tls.hostname}}/{{ acme_data['challenge_data'][tls.hostname]['http-01']['resource']}}"
+    return_content: yes
+  register: self_vaild_response
+  when: acme_data is changed
+
+- name: Check response value right
+  assert:
+    that:
+      - "self_vaild_response.content == acme_data['challenge_data'][tls.hostname]['http-01']['resource_value']"
+    fail_msg: "Error message, check your firewall"
+    success_msg: "Response right!"
+  when: acme_data is changed
+
+- name: Let the challenge be validated
+  acme_certificate:
+    account_key_src: "{{install_location}}/cert/account.pem"
+    challenge: http-01
+    src: "{{install_location}}/cert/cert.csr"
+    cert: "{{install_location}}/cert/sign.pem"
+    fullchain: "{{install_location}}/cert/fullchain.pem"
+    challenge: http-01
+    acme_version: 2
+    acme_directory: https://acme-staging-v02.api.letsencrypt.org/directory
+    data: "{{ acme_data }}"
+  when: acme_data is changed
+
+- name: Kill simple server
+  shell: kill -9 $(cat /tmp/acme/pid)
+  when: acme_data is changed

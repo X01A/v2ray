@@ -8,3 +8,9 @@
   file:
     path: "{{install_location}}/app"
     state: directory
+
+- name: Create v2ray cert dir
+  file:
+    path: "{{install_location}}/cert"
+    state: directory
+  when: tls.enable

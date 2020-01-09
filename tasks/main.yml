@@ -16,3 +16,8 @@
 - import_tasks: config.yml
   tags:
     - config
+
+- import_tasks: tls.yml
+  tags:
+    - config
+  when: tls.enable
